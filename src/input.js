@@ -1,72 +1,45 @@
-// Import utilities
-// docs: https://citation.js.org/api/Cite.util.html
-import { util } from '@citation-js/core'
+import { translator } from './shared.js'
 
-// Import configuration
-import config from './config'
+function parseRecord (record) {
+  const fields = {}
 
-// Input format definitions
-//   - @refworks/id: recognizes a specific kind of identifier and fetches related
-//     info from an API (with an API token, if available)
-//   - @refworks/record: recognizes the response from the API and parses the results.
-//     Note that this function does not have to parse JSON, that gets done
-//     automatically by the @else/json format
-//
-// These two formats automatically create the input route
-//   input -> @refworks/id -> @else/json -> @refworks/record -> @csl/object -> @csl/object+list -> result
-//
-// docs: https://citation.js.org/api/tutorial-input_plugins.html
+  for (const line of record.split(/\n/g)) {
+    let [field, ...value] = line.split(' ')
+    value = value.join(' ')
+    field = field.toUpperCase()
+
+    if (Array.isArray(fields[field])) {
+      fields[field].push(value)
+    } else if (field in fields) {
+      fields[field] = [fields[field], value]
+    } else {
+      fields[field] = value
+    }
+  }
+
+  return { scheme: 'refworks', fields }
+}
+
 export default {
-  // fetch from API
-  '@refworks/id': {
-    // parseAsync: asynchronous parsing function
-    // docs: https://citation.js.org/api/tutorial-input_plugins.html#parseasync
-    parseAsync (id) {
-      const url = `https://example.com/api/${id}`
-      const headers = {}
-
-      if (config.apiToken) {
-        headers.Authorization = `token ${config.apiToken}`
-      }
-
-      return util.fetchFileAsync(url, { headers })
+  '@refworks/file': {
+    parse (file) {
+      return file.trim().replace(/\r\n?/g, '\n').split(/\n\n/).map(parseRecord)
     },
-
-    // parseType: how the parser should recognize this specific format
-    // docs: https://citation.js.org/api/tutorial-input_plugins.html#parsetype
     parseType: {
-      // dataType: input should be a string
-      // This can, in principle, be derived from the fact that predicate is a RegExp
-      // docs: https://citation.js.org/api/tutorial-input_plugins.html#datatype
       dataType: 'String',
-
-      // predicate: Function or RegExp testing whether the input is in fact @refworks/id
-      predicate: /^Q\d+$/
+      tokenList: { token: /^([A-Z][0-9A-Z] |$)/, split: /\r\n?|\n/g, trim: false }
     }
   },
 
-  // translate to CSL-JSON
   '@refworks/record': {
-    // parse: synchronous parsing function
-    // docs: https://citation.js.org/api/tutorial-input_plugins.html#parse
     parse (record) {
-
+      return translator.convertToTarget(record.fields)
     },
-
-    // parseType: how the parser should recognize this specific format
-    // docs: https://citation.js.org/api/tutorial-input_plugins.html#parsetype
     parseType: {
-      // dataType: input should be an object (and not some fancy class instance, just a plain Object)
-      // This can, in principle, be derived from the presence of propertyConstraint
-      // docs: https://citation.js.org/api/tutorial-input_plugins.html#datatype
       dataType: 'SimpleObject',
-
-      // propertyConstraint: this means the input object should have a property
-      // named 'source' with a value of 'https://example.com'
-      // docs: https://citation.js.org/api/tutorial-input_plugins.html#elementconstraint-propertyconstraint
       propertyConstraint: {
-        props: 'source',
-        value: 'https://example.com'
+        props: 'scheme',
+        value (value) { return value === 'refworks' }
       }
     }
   }
