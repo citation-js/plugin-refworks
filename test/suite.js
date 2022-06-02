@@ -556,20 +556,20 @@ describe('refworks', function () {
   describe('output', function () {
     for (const { name, input, data, output = input } of apiTests) {
       it(name, function () {
-        assert.deepStrictEqual(plugins.output.format('refer', data), output)
+        assert.deepStrictEqual(plugins.output.format('refworks', data), output)
       })
     }
 
     it('other medium', function () {
       assert.deepStrictEqual(
-        plugins.output.format('refer', [{ medium: 'dvd' }]),
+        plugins.output.format('refworks', [{ medium: 'dvd' }]),
         'RT Book, Whole\n'
       )
     })
 
     it('nocase', function () {
       assert.deepStrictEqual(
-        plugins.output.format('refer', [{ title: '<span class="nocase">Test</span>' }]),
+        plugins.output.format('refworks', [{ title: '<span class="nocase">Test</span>' }]),
         'RT Book, Whole\nT1 Test\n'
       )
     })
@@ -579,7 +579,7 @@ describe('refworks', function () {
     for (const { name, input, data, output = input } of apiTests) {
       it(name, function () {
         const actualOutput = plugins.input.chainLink(output)
-        assert.deepStrictEqual(plugins.output.format('refer', data, { format: 'object' }), actualOutput)
+        assert.deepStrictEqual(plugins.output.format('refworks', data, { format: 'object' }), actualOutput)
       })
     }
   })

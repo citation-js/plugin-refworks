@@ -31,7 +31,7 @@ export default {
    * @param {String} [options.format="text"] - 'text' or 'object'
    * @param {String} [options.lineEnding="\n"]
    */
-  refer (csl, options = {}) {
+  refworks (csl, options = {}) {
     const { format = 'text', lineEnding = '\n' } = options
     const records = csl.map(translateRecord)
     if (format === 'object') {
