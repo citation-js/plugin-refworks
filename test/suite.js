@@ -1,9 +1,8 @@
-/* eslint-env mocha */
+import assert from 'node:assert'
+import { describe, it } from 'node:test'
 
-import '../src/'
-
-import assert from 'assert'
 import { plugins } from '@citation-js/core'
+import '../src/index.js'
 
 const apiTests = [
   {
