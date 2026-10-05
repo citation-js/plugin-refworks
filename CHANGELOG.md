@@ -1,3 +1,11 @@
+# [0.2.0](https://github.com/citation-js/plugin-refworks/compare/v0.1.2...v0.2.0) (2026-10-05)
+
+* chore!: update to Node.js v22 ([76c29f1](https://github.com/citation-js/plugin-refworks/commit/76c29f1ad713b7fbd6e40c8c1dfb5f649f1a143e))
+
+### BREAKING CHANGES
+
+* drop support for Node.js 14, 16, 18, 20
+
 ## [0.1.2](https://github.com/citation-js/plugin-refworks/compare/v0.1.1...v0.1.2) (2022-06-02)
 
 
